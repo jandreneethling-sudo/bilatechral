@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title><%= title %> - <%= invoice.invoice_number %></title>
+    <link rel="stylesheet" href="/assets/css/styles.css" />
+  </head>
+  <body>
+    <main class="container print-doc">
+      <section class="doc-head">
+        <div class="doc-brand">
+          <img src="/artwork/Logo-Master.png" alt="Bilatechral logo" />
+          <div>
+            <h1>Bilatechral Solutions (PTY) Ltd</h1>
+            <p>Reg Nr: 2023/910602/07</p>
+            <p>Portion 5, Olifanstpoortje 319 KT, Extention 23, Steelpoort, Limpopo, South Africa</p>
+          </div>
+        </div>
+        <div>
+          <h2>Customer Invoice</h2>
+          <p><strong>Invoice:</strong> <%= invoice.invoice_number %></p>
+          <p><strong>Date:</strong> <%= formatDate(invoice.generated_at) %></p>
+          <p><strong>Status:</strong> <%= invoice.status %></p>
+        </div>
+      </section>
+
+      <section class="card">
+        <h3>Customer Details</h3>
+        <div class="details-grid">
+          <p><strong>Customer:</strong> <%= invoice.customer_name %></p>
+          <p><strong>Ticket:</strong> <%= invoice.ticket_number %></p>
+          <p><strong>Truck Registration:</strong> <%= invoice.truck_registration %></p>
+          <p><strong>Ore Grade:</strong> <%= invoice.ore_grade || 'N/A' %></p>
+          <p><strong>Net Tonnage:</strong> <%= invoice.net_weight %> t</p>
+          <p><strong>Captured By:</strong> <%= invoice.captured_by_name %></p>
+        </div>
+      </section>
+
+      <section class="card">
+        <h3>Amount Due</h3>
+        <table>
+          <thead>
+            <tr>
+              <th>Description</th>
+              <th>Amount (R)</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Chrome load - ticket <%= invoice.ticket_number %></td>
+              <td><%= Number(invoice.amount).toFixed(2) %></td>
+            </tr>
+          </tbody>
+        </table>
+      </section>
+
+      <section class="signatures">
+        <div>
+          <p>_________________________</p>
+          <p>Authorized by Bilatechral</p>
+        </div>
+        <div>
+          <p>_________________________</p>
+          <p>Customer Signature</p>
+        </div>
+      </section>
+
+      <section class="actions-row no-print">
+        <a class="btn secondary" href="/dashboard">Back to Dashboard</a>
+        <button class="btn" onclick="window.print()">Print Invoice</button>
+        <a class="btn" href="/invoices/<%= invoice.ticket_id %>/pdf">Download PDF</a>
+        <% if (invoice.status === 'draft') { %>
+        <form method="post" action="/invoices/<%= invoice.ticket_id %>/mark-sent" class="inline-form">
+          <input type="hidden" name="_csrf" value="<%= csrfToken %>" />
+          <button class="btn secondary" type="submit">Mark as Sent</button>
+        </form>
+        <% } %>
+        <% if (invoice.status !== 'paid') { %>
+        <form method="post" action="/invoices/<%= invoice.ticket_id %>/mark-paid" class="inline-form">
+          <input type="hidden" name="_csrf" value="<%= csrfToken %>" />
+          <button class="btn" type="submit">Mark as Paid</button>
+        </form>
+        <% } %>
+      </section>
+    </main>
+  </body>
+</html>

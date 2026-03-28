@@ -1,0 +1,27 @@
+<%- include('../partials/header', { title, currentUser: null }) %>
+
+<section class="auth-wrap">
+  <div class="card auth-card">
+    <h1>Staff Login</h1>
+    <p>Sign in to capture weighbridge transactions and manage operations.</p>
+
+    <% if (error) { %>
+    <div class="alert"><%= error %></div>
+    <% } %>
+
+    <form method="post" action="/login" class="form-grid">
+      <input type="hidden" name="_csrf" value="<%= csrfToken %>" />
+      <label>
+        Email
+        <input type="email" name="email" required />
+      </label>
+      <label>
+        Password
+        <input type="password" name="password" required />
+      </label>
+      <button class="btn" type="submit">Login</button>
+    </form>
+  </div>
+</section>
+
+<%- include('../partials/footer') %>

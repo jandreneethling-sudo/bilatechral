@@ -1,0 +1,86 @@
+<%- include('../partials/header', { title, currentUser: user }) %>
+
+<section class="page-head split">
+  <div>
+    <h1>Operations Dashboard</h1>
+    <p>Welcome, <strong><%= user.fullName %></strong> (<%= user.role.toUpperCase() %>)</p>
+  </div>
+  <a class="btn" href="/tickets/new">Capture New Weighbridge Ticket</a>
+</section>
+
+<section class="cards three">
+  <article class="card">
+    <h3>Total Tickets</h3>
+    <p class="stat"><%= stats.total_tickets %></p>
+  </article>
+  <article class="card">
+    <h3>Supplier Offload Tonnage</h3>
+    <p class="stat"><%= stats.supplier_tonnage %> t</p>
+  </article>
+  <article class="card">
+    <h3>Customer Load Tonnage</h3>
+    <p class="stat"><%= stats.customer_tonnage %> t</p>
+  </article>
+</section>
+
+<section class="card">
+  <h2>Recent Weighbridge Tickets</h2>
+  <table>
+    <thead>
+      <tr>
+        <th>Ticket</th>
+        <th>Type</th>
+        <th>Party</th>
+        <th>Truck</th>
+        <th>Net Weight</th>
+        <% if (user.role === 'md') { %>
+        <th>Invoice Status</th>
+        <% } %>
+        <th>Date</th>
+        <th>Action</th>
+      </tr>
+    </thead>
+    <tbody>
+      <% tickets.forEach((ticket) => { %>
+      <tr>
+        <td><%= ticket.ticket_number %></td>
+        <td><%= ticket.transaction_type %></td>
+        <td><%= ticket.party_name %></td>
+        <td><%= ticket.truck_registration %></td>
+        <td><%= ticket.net_weight %> t</td>
+        <% if (user.role === 'md') { %>
+        <td>
+          <% if (ticket.transaction_type === 'customer_load') { %>
+          <%= ticket.invoice_status || 'draft' %>
+          <% } else { %>
+          N/A
+          <% } %>
+        </td>
+        <% } %>
+        <td><%= formatDate(ticket.created_at) %></td>
+        <td>
+          <a href="/tickets/<%= ticket.id %>/receipt">Receipt</a>
+          <% if (user.role === 'md' && ticket.transaction_type === 'customer_load') { %>
+          | <a href="/invoices/<%= ticket.id %>">Invoice</a>
+          <% } %>
+        </td>
+      </tr>
+      <% }) %>
+      <% if (!tickets.length) { %>
+      <tr>
+        <td colspan="<%= user.role === 'md' ? 8 : 7 %>">No tickets captured yet.</td>
+      </tr>
+      <% } %>
+    </tbody>
+  </table>
+
+  <% if (user.role === 'md') { %>
+  <div class="actions-row">
+    <a class="btn secondary" href="/payments">View Supplier Payments</a>
+    <a class="btn secondary" href="/reports/monthly">Monthly Report</a>
+    <a class="btn secondary" href="/exports/tickets.csv">Export Current Month Tickets CSV</a>
+  </div>
+  <% } %>
+</section>
+
+<%- include('../partials/footer') %>

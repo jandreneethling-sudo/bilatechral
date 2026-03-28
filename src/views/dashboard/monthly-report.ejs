@@ -1,0 +1,106 @@
+<%- include('../partials/header', { title, currentUser: user }) %>
+
+<section class="page-head split">
+  <div>
+    <h1>Monthly Report</h1>
+    <p>Operations and value summary for <strong><%= monthLabel %></strong>.</p>
+  </div>
+  <a class="btn secondary" href="/dashboard">Back to Dashboard</a>
+</section>
+
+<section class="card">
+  <% if (emailStatus === 'sent') { %>
+  <div class="alert">Monthly summary email was sent successfully.</div>
+  <% } %>
+  <% if (emailStatus === 'smtp-not-configured') { %>
+  <div class="alert">SMTP is not configured. Update .env SMTP settings first.</div>
+  <% } %>
+  <% if (emailStatus === 'failed') { %>
+  <div class="alert">Failed to send monthly summary email. Please verify SMTP settings.</div>
+  <% } %>
+
+  <form method="get" action="/reports/monthly" class="form-grid two-cols">
+    <input type="hidden" name="_csrf" value="<%= csrfToken %>" />
+    <label>
+      Month
+      <input type="month" name="month" value="<%= month %>" required />
+    </label>
+    <label>
+      Actions
+      <div class="actions-row">
+        <button class="btn" type="submit">Load Report</button>
+        <a class="btn secondary" href="/reports/monthly.csv?month=<%= month %>">Export CSV</a>
+        <a class="btn secondary" href="/reports/monthly.pdf?month=<%= month %>">Export PDF</a>
+        <a class="btn secondary" href="/settings/smtp-diagnostics">SMTP Diagnostics</a>
+        <button class="btn secondary" type="submit" formmethod="post" formaction="/reports/monthly/test-email">
+          Send Test Email
+        </button>
+      </div>
+    </label>
+  </form>
+</section>
+
+<section class="cards three">
+  <article class="card">
+    <h3>Total Tickets</h3>
+    <p class="stat"><%= summary.total_tickets %></p>
+  </article>
+  <article class="card">
+    <h3>Supplier Tonnage</h3>
+    <p class="stat"><%= summary.supplier_tonnage %> t</p>
+  </article>
+  <article class="card">
+    <h3>Customer Tonnage</h3>
+    <p class="stat"><%= summary.customer_tonnage %> t</p>
+  </article>
+</section>
+
+<section class="cards three">
+  <article class="card">
+    <h3>Supplier Purchase Value</h3>
+    <p class="stat">R <%= Number(summary.supplier_value).toFixed(2) %></p>
+  </article>
+  <article class="card">
+    <h3>Sales Value</h3>
+    <p class="stat">R <%= Number(summary.sales_value).toFixed(2) %></p>
+  </article>
+  <article class="card">
+    <h3>Estimated Margin</h3>
+    <p class="stat">R <%= Number(summary.margin).toFixed(2) %></p>
+  </article>
+</section>
+
+<section class="card">
+  <h2>Transactions</h2>
+  <table>
+    <thead>
+      <tr>
+        <th>Ticket</th>
+        <th>Type</th>
+        <th>Party</th>
+        <th>Net Weight</th>
+        <th>Total Amount</th>
+        <th>Date</th>
+      </tr>
+    </thead>
+    <tbody>
+      <% transactions.forEach((item) => { %>
+      <tr>
+        <td><%= item.ticket_number %></td>
+        <td><%= item.transaction_type %></td>
+        <td><%= item.party_name %></td>
+        <td><%= item.net_weight %> t</td>
+        <td>R <%= Number(item.total_amount || 0).toFixed(2) %></td>
+        <td><%= formatDate(item.created_at) %></td>
+      </tr>
+      <% }) %>
+      <% if (!transactions.length) { %>
+      <tr>
+        <td colspan="6">No transactions found for this month.</td>
+      </tr>
+      <% } %>
+    </tbody>
+  </table>
+</section>
+
+<%- include('../partials/footer') %>

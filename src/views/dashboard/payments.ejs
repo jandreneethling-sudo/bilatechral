@@ -1,0 +1,54 @@
+<%- include('../partials/header', { title, currentUser: user }) %>
+
+<section class="page-head split">
+  <div>
+    <h1>Supplier Payments</h1>
+    <p>Pending and completed supplier payment records from offload transactions.</p>
+  </div>
+  <a class="btn secondary" href="/dashboard">Back to Dashboard</a>
+</section>
+
+<section class="card">
+  <table>
+    <thead>
+      <tr>
+        <th>Ticket</th>
+        <th>Supplier</th>
+        <th>Net Weight</th>
+        <th>Amount</th>
+        <th>Status</th>
+        <th>Created</th>
+        <th>Action</th>
+      </tr>
+    </thead>
+    <tbody>
+      <% payments.forEach((payment) => { %>
+      <tr>
+        <td><%= payment.ticket_number %></td>
+        <td><%= payment.supplier_name %></td>
+        <td><%= payment.net_weight %> t</td>
+        <td>R <%= Number(payment.amount).toFixed(2) %></td>
+        <td><%= payment.status %></td>
+        <td><%= formatDate(payment.created_at) %></td>
+        <td>
+          <% if (payment.status === 'pending') { %>
+          <form method="post" action="/payments/<%= payment.id %>/mark-paid" class="inline-form">
+            <input type="hidden" name="_csrf" value="<%= csrfToken %>" />
+            <button type="submit" class="btn small">Mark Paid</button>
+          </form>
+          <% } else { %>
+          Completed
+          <% } %>
+        </td>
+      </tr>
+      <% }) %>
+      <% if (!payments.length) { %>
+      <tr>
+        <td colspan="7">No supplier payments recorded yet.</td>
+      </tr>
+      <% } %>
+    </tbody>
+  </table>
+</section>
+
+<%- include('../partials/footer') %>

@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title><%= title %> - <%= ticket.ticket_number %></title>
+    <link rel="stylesheet" href="/assets/css/styles.css" />
+  </head>
+  <body>
+    <main class="container print-doc">
+      <section class="doc-head">
+        <div class="doc-brand">
+          <img src="/artwork/Logo-Master.png" alt="Bilatechral logo" />
+          <div>
+            <h1>Bilatechral Solutions (PTY) Ltd</h1>
+            <p>Reg Nr: 2023/910602/07</p>
+            <p>Portion 5, Olifanstpoortje 319 KT, Extention 23, Steelpoort, Limpopo, South Africa</p>
+          </div>
+        </div>
+        <div>
+          <h2>Weighbridge Receipt</h2>
+          <p><strong>Ticket:</strong> <%= ticket.ticket_number %></p>
+          <p><strong>Date:</strong> <%= formatDate(ticket.created_at) %></p>
+        </div>
+      </section>
+
+      <section class="card">
+        <h3>Transaction Details</h3>
+        <div class="details-grid">
+          <p><strong>Type:</strong> <%= ticket.transaction_type %></p>
+          <p><strong>Party:</strong> <%= ticket.party_name %></p>
+          <p><strong>Truck Registration:</strong> <%= ticket.truck_registration %></p>
+          <p><strong>Driver:</strong> <%= ticket.driver_name || 'N/A' %></p>
+          <p><strong>Ore Grade/Product:</strong> <%= ticket.ore_grade || 'N/A' %></p>
+          <p><strong>Captured By:</strong> <%= ticket.captured_by_name %></p>
+        </div>
+      </section>
+
+      <section class="card">
+        <h3>Weight Breakdown</h3>
+        <table>
+          <thead>
+            <tr>
+              <th>Tare (t)</th>
+              <th>Gross (t)</th>
+              <th>Net (t)</th>
+              <th>Unit Price (R/t)</th>
+              <th>Total (R)</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><%= ticket.tare_weight %></td>
+              <td><%= ticket.gross_weight %></td>
+              <td><%= ticket.net_weight %></td>
+              <td><%= ticket.unit_price ? Number(ticket.unit_price).toFixed(2) : '0.00' %></td>
+              <td><%= Number(ticket.total_amount || 0).toFixed(2) %></td>
+            </tr>
+          </tbody>
+        </table>
+        <p><strong>Notes:</strong> <%= ticket.notes || 'None' %></p>
+      </section>
+
+      <section class="signatures">
+        <div>
+          <p>_________________________</p>
+          <p>Staff Signature</p>
+        </div>
+        <div>
+          <p>_________________________</p>
+          <p>Driver / Representative Signature</p>
+        </div>
+      </section>
+
+      <section class="actions-row no-print">
+        <a class="btn secondary" href="/dashboard">Back to Dashboard</a>
+        <button class="btn" onclick="window.print()">Print Receipt</button>
+        <a class="btn" href="/tickets/<%= ticket.id %>/receipt.pdf">Download PDF</a>
+        <% if (user.role === 'md' && ticket.transaction_type === 'customer_load') { %>
+        <a class="btn" href="/invoices/<%= ticket.id %>">View Invoice</a>
+        <% } %>
+      </section>
+    </main>
+  </body>
+</html>

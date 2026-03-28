@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title><%= title %> | Bilatechral</title>
+    <link rel="icon" type="image/png" href="/artwork/Logo-Master.png" />
+    <link rel="stylesheet" href="/assets/css/styles.css" />
+  </head>
+  <body>
+    <header class="site-header">
+      <div class="container nav-wrapper">
+        <a class="brand" href="/">
+          <img src="/artwork/Logo-Master.png" alt="Bilatechral logo" />
+          <span>Bilatechral Solutions</span>
+        </a>
+        <nav>
+          <a href="/">Home</a>
+          <a href="/company-profile">Company Profile</a>
+          <% if (currentUser) { %>
+          <a href="/dashboard">Dashboard</a>
+          <% if (currentUser.role === 'md') { %>
+          <a href="/reports/monthly">Monthly Report</a>
+          <% } %>
+          <form action="/logout" method="post" class="inline-form">
+            <input type="hidden" name="_csrf" value="<%= csrfToken %>" />
+            <button type="submit" class="link-btn">Logout</button>
+          </form>
+          <% } else { %>
+          <a class="btn" href="/login">Staff Login</a>
+          <% } %>
+        </nav>
+      </div>
+    </header>
+    <main class="container">

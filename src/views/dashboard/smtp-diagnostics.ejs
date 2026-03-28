@@ -1,0 +1,56 @@
+<%- include('../partials/header', { title, currentUser: user }) %>
+
+<section class="page-head split">
+  <div>
+    <h1>SMTP Diagnostics</h1>
+    <p>Email configuration and connectivity status for Bilatechral notifications.</p>
+  </div>
+  <a class="btn secondary" href="/reports/monthly">Back to Monthly Report</a>
+</section>
+
+<section class="card">
+  <% if (diagnostics.canSend) { %>
+  <div class="alert">SMTP is ready and notification emails can be sent.</div>
+  <% } else { %>
+  <div class="alert"><%= diagnostics.message %></div>
+  <% } %>
+
+  <table>
+    <tbody>
+      <tr>
+        <th>SMTP Credentials Configured</th>
+        <td><%= diagnostics.configured ? 'Yes' : 'No' %></td>
+      </tr>
+      <tr>
+        <th>MD Notification Email Configured</th>
+        <td><%= diagnostics.notificationEmailConfigured ? 'Yes' : 'No' %></td>
+      </tr>
+      <tr>
+        <th>Effective Send Readiness</th>
+        <td><%= diagnostics.canSend ? 'Ready' : 'Not Ready' %></td>
+      </tr>
+      <tr>
+        <th>SMTP Host</th>
+        <td><%= diagnostics.host || 'Not set' %></td>
+      </tr>
+      <tr>
+        <th>SMTP Port</th>
+        <td><%= diagnostics.port || 'Not set' %></td>
+      </tr>
+      <tr>
+        <th>From Address</th>
+        <td><%= diagnostics.from || 'Not set' %></td>
+      </tr>
+      <tr>
+        <th>MD Notification Email</th>
+        <td><%= diagnostics.notificationEmail || 'Not set' %></td>
+      </tr>
+      <tr>
+        <th>Diagnostic Message</th>
+        <td><%= diagnostics.message %></td>
+      </tr>
+    </tbody>
+  </table>
+</section>
+
+<%- include('../partials/footer') %>
